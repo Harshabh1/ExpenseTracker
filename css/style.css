@@ -32,10 +32,8 @@ body.dark-mode {
   --light-bg: #0a0e27;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+html {
+  scroll-behavior: smooth;
 }
 
 html, body {
@@ -546,6 +544,7 @@ body.dark-mode .sidebar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  box-shadow: var(--shadow);
 }
 
 .dark-mode-toggle:hover, .menu-toggle:hover {
@@ -556,8 +555,12 @@ body.dark-mode .sidebar {
   box-shadow: 0 4px 12px rgba(77, 179, 255, 0.3);
 }
 
-.menu-toggle {
-  display: none;
+.dark-mode-toggle:active, .menu-toggle:active {
+  transform: translateY(0);
+}
+
+#darkModeIcon {
+  font-size: 1.25rem;
 }
 
 .dashboard-content {
