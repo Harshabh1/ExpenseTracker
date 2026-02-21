@@ -195,15 +195,15 @@
                   <textarea id="transactionNotes" placeholder="Add notes about this transaction" rows="3"></textarea>
                 </div>
               </div>
-              <button type="submit" class="btn btn-secondary btn-add-transaction">Add Transaction</button>
+              <button type="submit" class="btn btn-primary btn-add-transaction">Add Transaction</button>
             </form>
           </div>
             </form>
           </div>
 
           <!-- Recent Transactions -->
-          <div>
-            <h3 style="margin-bottom: 1rem; color: var(--text-color);">Recent Transactions</h3>
+          <div class="recent-transactions-wrapper">
+            <h3 class="recent-transactions-title">Recent Transactions</h3>
             <div class="transactions-list" id="recentTransactions">
               <p class="no-data">No transactions yet. Add one to get started!</p>
             </div>
@@ -294,6 +294,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
+    // Initialize page on load
+    window.addEventListener('load', function() {
+      loadUserProfile();
+      applyDarkModePreference();
+    });
+
     // Set today's date as default in transaction form
     const dateInput = document.getElementById('transactionDate');
     if (dateInput) {

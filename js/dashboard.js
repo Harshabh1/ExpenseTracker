@@ -483,7 +483,7 @@ const Dashboard = {
   populatePaymentMethodSelect() {
     const paymentSelects = document.querySelectorAll('#transactionPaymentMethod, #editPaymentMethod');
     paymentSelects.forEach(select => {
-      select.innerHTML = this.paymentMethods.map(method => 
+      select.innerHTML = '<option value="">Select Payment Method</option>' + this.paymentMethods.map(method => 
         `<option value="${method}">${method}</option>`
       ).join('');
     });
