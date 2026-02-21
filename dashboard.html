@@ -19,28 +19,27 @@
 
       <nav class="sidebar-nav">
         <li class="sidebar-nav-item">
-          <a href="#dashboard" class="sidebar-nav-link icon-dashboard" title="Dashboard">Dashboard</a>
+          <a href="#dashboard" class="sidebar-nav-link icon-dashboard" title="Dashboard"><span class="nav-label">Dashboard</span></a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#accounts" class="sidebar-nav-link icon-accounts" title="Accounts">Accounts</a>
+          <a href="#accounts" class="sidebar-nav-link icon-accounts" title="Accounts"><span class="nav-label">Accounts</span></a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#transactions" class="sidebar-nav-link icon-transactions" title="Transactions">Transactions</a>
+          <a href="#transactions" class="sidebar-nav-link icon-transactions" title="Transactions"><span class="nav-label">Transactions</span></a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#spending-breakdown" class="sidebar-nav-link icon-breakdown" title="Spending">Spending</a>
+          <a href="#spending-breakdown" class="sidebar-nav-link icon-breakdown" title="Spending"><span class="nav-label">Spending</span></a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#analytics" class="sidebar-nav-link icon-analytics" title="Analytics">Analytics</a>
+          <a href="#analytics" class="sidebar-nav-link icon-analytics" title="Analytics"><span class="nav-label">Analytics</span></a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#insights" class="sidebar-nav-link icon-insights" title="Insights">Insights</a>
+          <a href="#insights" class="sidebar-nav-link icon-insights" title="Insights"><span class="nav-label">Insights</span></a>
         </li>
       </nav>
 
       <div class="sidebar-footer">
-        <button type="button" id="settingsBtn" class="btn btn-primary" title="Settings">⚙️</button>
-        <button type="button" id="logoutBtn" class="btn btn-danger" title="Logout">🚪</button>
+        <!-- Empty - user controls now in top-right -->
       </div>
     </aside>
 
@@ -49,12 +48,29 @@
       <!-- Top Bar -->
       <div class="top-bar">
         <div class="top-bar-left">
+          <button type="button" id="menuToggle" class="menu-toggle">☰</button>
           <h1>Dashboard</h1>
           <p class="user-greeting" id="userGreeting">Welcome!</p>
         </div>
         <div class="top-bar-controls">
-
-          <button type="button" id="menuToggle" class="menu-toggle">☰</button>
+          <!-- User Profile Dropdown -->
+          <div class="user-profile-dropdown">
+            <button type="button" class="user-profile-btn" id="userProfileBtn">
+              <img id="userProfilePhoto" src="" alt="Profile" class="user-photo">
+              <span id="userProfileName" class="user-name">User</span>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="user-dropdown-menu" id="userDropdownMenu">
+              <button type="button" class="dropdown-item" id="settingsBtn">
+                <span class="dropdown-icon">⚙️</span>
+                <span>Account Settings</span>
+              </button>
+              <button type="button" class="dropdown-item" id="logoutBtn">
+                <span class="dropdown-icon">🚪</span>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -277,10 +293,22 @@
           </button>
         </div>
 
-        <!-- User Name -->
+        <!-- Full Name -->
         <div class="form-group">
           <label for="settingsUserName">Full Name</label>
           <input type="text" id="settingsUserName" placeholder="Enter your full name" required>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="settingsUsername">Username</label>
+          <input type="text" id="settingsUsername" placeholder="Enter your username" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="settingsEmail">Email Address</label>
+          <input type="email" id="settingsEmail" placeholder="Enter your email" required>
         </div>
 
         <!-- Phone Number -->
@@ -289,17 +317,11 @@
           <input type="tel" id="settingsPhoneNumber" placeholder="Enter your phone number">
         </div>
 
-        <!-- Email -->
-        <div class="form-group">
-          <label for="settingsEmail">Email</label>
-          <input type="email" id="settingsEmail" placeholder="Enter your email" required>
-        </div>
-
         <!-- Dark Mode Toggle -->
-        <div class="form-group">
-          <label for="settingsDarkMode">
-            <input type="checkbox" id="settingsDarkMode" style="margin-right: 0.5rem; width: auto;">
-            Dark Mode
+        <div class="form-group checkbox-group">
+          <label for="settingsDarkMode" class="checkbox-label">
+            <input type="checkbox" id="settingsDarkMode">
+            <span>Enable Dark Mode</span>
           </label>
         </div>
 
@@ -339,13 +361,49 @@
     }
 
     // Account Settings Functions
+    function loadUserProfile() {
+      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const userPhoto = localStorage.getItem('userProfilePhoto') || '';
+      
+      // Update top-right user profile button
+      const userNameEl = document.getElementById('userProfileName');
+      const userPhotoEl = document.getElementById('userProfilePhoto');
+      
+      if (userNameEl) {
+        userNameEl.textContent = user.name || user.email || 'User';
+      }
+      
+      if (userPhotoEl) {
+        if (userPhoto) {
+          userPhotoEl.src = userPhoto;
+          userPhotoEl.style.display = 'block';
+        } else {
+          userPhotoEl.style.display = 'none';
+        }
+      }
+    }
+
     function openAccountSettings() {
       const modal = document.getElementById('accountSettingsModal');
       const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const userPhoto = localStorage.getItem('userProfilePhoto') || '';
+      
       document.getElementById('settingsUserName').value = user.name || '';
+      document.getElementById('settingsUsername').value = user.username || user.email || '';
       document.getElementById('settingsEmail').value = user.email || '';
       document.getElementById('settingsPhoneNumber').value = user.phone || '';
       document.getElementById('settingsDarkMode').checked = localStorage.getItem('darkMode') === 'true';
+      
+      // Load profile photo preview
+      const preview = document.getElementById('profilePicPreview');
+      if (userPhoto) {
+        preview.style.backgroundImage = `url('${userPhoto}')`;
+        preview.textContent = '';
+      } else {
+        preview.style.backgroundImage = 'none';
+        preview.textContent = '👤';
+      }
+      
       modal.classList.add('active');
     }
 
@@ -353,11 +411,31 @@
       document.getElementById('accountSettingsModal').classList.remove('active');
     }
 
+    // Toggle User Dropdown Menu
+    function toggleUserDropdown() {
+      const menu = document.getElementById('userDropdownMenu');
+      if (menu) {
+        menu.classList.toggle('active');
+      }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const userProfile = document.querySelector('.user-profile-dropdown');
+      if (userProfile && !userProfile.contains(e.target)) {
+        const menu = document.getElementById('userDropdownMenu');
+        if (menu) {
+          menu.classList.remove('active');
+        }
+      }
+    });
+
     // Save Settings
     document.getElementById('accountSettingsForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const user = {
         name: document.getElementById('settingsUserName').value,
+        username: document.getElementById('settingsUsername').value,
         email: document.getElementById('settingsEmail').value,
         phone: document.getElementById('settingsPhoneNumber').value
       };
@@ -367,16 +445,33 @@
       const darkModeEnabled = document.getElementById('settingsDarkMode').checked;
       if (darkModeEnabled) {
         document.body.classList.add('dark-mode');
-        document.getElementById('darkModeIcon').textContent = '☀️';
         localStorage.setItem('darkMode', 'true');
       } else {
         document.body.classList.remove('dark-mode');
-        document.getElementById('darkModeIcon').textContent = '🌙';
         localStorage.setItem('darkMode', 'false');
       }
       
+      // Reload user profile
+      loadUserProfile();
+      
       alert('Settings saved successfully!');
       closeAccountSettings();
+    });
+
+    // Handle profile photo upload
+    document.getElementById('profilePicFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const photoData = event.target.result;
+          localStorage.setItem('userProfilePhoto', photoData);
+          const preview = document.getElementById('profilePicPreview');
+          preview.style.backgroundImage = `url('${photoData}')`;
+          preview.textContent = '';
+        };
+        reader.readAsDataURL(file);
+      }
     });
 
     // Export to PDF
@@ -479,9 +574,33 @@
     // Settings button click
     document.getElementById('settingsBtn').addEventListener('click', openAccountSettings);
 
+    // User profile button toggle
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    if (userProfileBtn) {
+      userProfileBtn.addEventListener('click', toggleUserDropdown);
+    }
+
+    // Logout button click
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userProfilePhoto');
+        window.location.href = 'index.html';
+      }
+    });
+
     // Close modal when clicking outside
     document.getElementById('accountSettingsModal').addEventListener('click', function(e) {
       if (e.target === this) closeAccountSettings();
+    });
+
+    // Initialize user profile on page load
+    window.addEventListener('load', function() {
+      loadUserProfile();
+      // Load dark mode preference
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+      }
     });
   </script>
 </body>
