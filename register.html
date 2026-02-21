@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker - Register</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h1>💰 Expense Tracker</h1>
+      <p>Join us to manage your expenses</p>
+
+      <form class="registration-form" id="registrationForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Create a password (min 6 characters)" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+      </form>
+
+      <div class="auth-link">
+        Already have an account? <a href="index.html">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Handle registration form submission
+    const registrationForm = document.getElementById('registrationForm');
+    registrationForm.addEventListener('submit', (e) => Auth.handleRegistration(e));
+
+    // Check if already logged in
+    if (Auth.isLoggedIn()) {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</body>
+</html>
