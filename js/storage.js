@@ -346,6 +346,163 @@ const Storage = {
     });
 
     return quarterlySpending;
+  },
+
+  // ==================== ACCOUNT EDIT/DELETE ====================
+  /**
+   * Delete an account
+   */
+  deleteAccount(accountId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'User not logged in' };
+
+    let allAccounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+    const account = allAccounts.find(acc => acc.id === accountId && acc.userId === currentUser.id);
+    
+    if (!account) return { success: false, message: 'Account not found' };
+
+    allAccounts = allAccounts.filter(acc => acc.id !== accountId);
+    localStorage.setItem('accounts', JSON.stringify(allAccounts));
+    
+    return { success: true, message: 'Account deleted successfully' };
+  },
+
+  /**
+   * Update account details
+   */
+  updateAccount(accountId, updates) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'User not logged in' };
+
+    let allAccounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+    const account = allAccounts.find(acc => acc.id === accountId && acc.userId === currentUser.id);
+    
+    if (!account) return { success: false, message: 'Account not found' };
+
+    if (updates.bankName) account.bankName = updates.bankName;
+    if (updates.accountType) account.accountType = updates.accountType;
+    
+    localStorage.setItem('accounts', JSON.stringify(allAccounts));
+    return { success: true, account, message: 'Account updated successfully' };
+  },
+
+  // ==================== TRANSACTION EDIT/DELETE ====================
+  /**
+   * Delete a transaction and revert balance
+   */
+  deleteTransaction(transactionId) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'User not logged in' };
+
+    let allTransactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const transaction = allTransactions.find(t => t.id === transactionId && t.userId === currentUser.id);
+    
+    if (!transaction) return { success: false, message: 'Transaction not found' };
+
+    // Revert balance change
+    const account = this.getAccounts().find(acc => acc.id === transaction.accountId);
+    if (account) {
+      const balanceChange = transaction.type === 'credit' 
+        ? -transaction.amount 
+        : transaction.amount;
+      this.updateAccountBalance(transaction.accountId, account.balance + balanceChange);
+    }
+
+    allTransactions = allTransactions.filter(t => t.id !== transactionId);
+    localStorage.setItem('transactions', JSON.stringify(allTransactions));
+    
+    return { success: true, message: 'Transaction deleted successfully' };
+  },
+
+  /**
+   * Update transaction details
+   */
+  updateTransaction(transactionId, updates) {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, message: 'User not logged in' };
+
+    let allTransactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const transaction = allTransactions.find(t => t.id === transactionId && t.userId === currentUser.id);
+    
+    if (!transaction) return { success: false, message: 'Transaction not found' };
+
+    const oldAmount = transaction.amount;
+    const oldType = transaction.type;
+
+    // Get old account and revert balance
+    const oldAccount = this.getAccounts().find(acc => acc.id === transaction.accountId);
+    if (oldAccount) {
+      const oldBalanceChange = oldType === 'credit' 
+        ? -oldAmount 
+        : oldAmount;
+      this.updateAccountBalance(transaction.accountId, oldAccount.balance + oldBalanceChange);
+    }
+
+    // Update transaction
+    if (updates.type) transaction.type = updates.type;
+    if (updates.category) transaction.category = updates.category;
+    if (updates.amount) transaction.amount = parseFloat(updates.amount);
+    if (updates.date) transaction.date = updates.date;
+    if (updates.paymentMethod) transaction.paymentMethod = updates.paymentMethod;
+    if (updates.notes !== undefined) transaction.notes = updates.notes;
+
+    // Apply new balance change
+    const newAccount = this.getAccounts().find(acc => acc.id === transaction.accountId);
+    if (newAccount) {
+      const newBalanceChange = transaction.type === 'credit' 
+        ? transaction.amount 
+        : -transaction.amount;
+      this.updateAccountBalance(transaction.accountId, newAccount.balance + newBalanceChange);
+    }
+
+    localStorage.setItem('transactions', JSON.stringify(allTransactions));
+    return { success: true, transaction, message: 'Transaction updated successfully' };
+  },
+
+  // ==================== SPENDING BREAKDOWN ====================
+  /**
+   * Get spending by category and payment method
+   */
+  getSpendingBreakdown() {
+    const transactions = this.getTransactions().filter(t => t.type === 'debit');
+    const breakdown = {};
+
+    transactions.forEach(t => {
+      const category = t.category || 'Other';
+      const method = t.paymentMethod || 'Unknown';
+      const key = `${category}|${method}`;
+
+      if (!breakdown[key]) {
+        breakdown[key] = {
+          category,
+          method,
+          amount: 0,
+          count: 0
+        };
+      }
+      breakdown[key].amount += t.amount;
+      breakdown[key].count += 1;
+    });
+
+    return Object.values(breakdown);
+  },
+
+  /**
+   * Get spending by payment method only
+   */
+  getSpendingByPaymentMethod() {
+    const transactions = this.getTransactions().filter(t => t.type === 'debit');
+    const methodSpending = {};
+
+    transactions.forEach(t => {
+      const method = t.paymentMethod || 'Unknown';
+      if (!methodSpending[method]) {
+        methodSpending[method] = 0;
+      }
+      methodSpending[method] += t.amount;
+    });
+
+    return methodSpending;
   }
 };
 

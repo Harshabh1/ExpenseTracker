@@ -4,6 +4,7 @@
 
 const Dashboard = {
   categories: ['Food', 'Rent', 'Travel', 'EMI', 'Shopping', 'Bills', 'Investment', 'Entertainment', 'Healthcare', 'Education', 'Utilities', 'Other'],
+  paymentMethods: ['Cash', 'Debit Card', 'Credit Card', 'UPI', 'Bank Transfer', 'Wallet', 'Cheque', 'Other'],
 
   /**
    * Initialize dashboard
@@ -15,6 +16,7 @@ const Dashboard = {
     this.updateDashboard();
     this.populateAccountSelects();
     this.populateCategorySelect();
+    this.populatePaymentMethodSelect();
   },
 
   /**
@@ -111,6 +113,7 @@ const Dashboard = {
     this.updateSummaryCards();
     this.displayAccounts();
     this.displayTransactions();
+    this.displaySpendingBreakdown();
     this.updateFinancialInsights();
     Charts.refreshAllCharts();
   },
@@ -203,8 +206,14 @@ const Dashboard = {
     accountsContainer.innerHTML = accounts.map(account => `
       <div class="account-card">
         <div class="account-header">
-          <h3>${account.bankName}</h3>
-          <span class="account-type">${account.accountType}</span>
+          <div>
+            <h3>${account.bankName}</h3>
+            <span class="account-type">${account.accountType}</span>
+          </div>
+          <div class="account-actions">
+            <button type="button" class="btn-icon edit-btn" onclick="Dashboard.editAccount(${account.id})" title="Edit">✎</button>
+            <button type="button" class="btn-icon delete-btn" onclick="Dashboard.deleteAccount(${account.id})" title="Delete">✕</button>
+          </div>
         </div>
         <div class="account-balance">
           Balance: <strong>₹${account.balance.toFixed(2)}</strong>
@@ -226,6 +235,7 @@ const Dashboard = {
       accountId: parseInt(document.getElementById('transactionAccount').value),
       type: document.getElementById('transactionType').value,
       category: document.getElementById('transactionCategory').value,
+      paymentMethod: document.getElementById('transactionPaymentMethod').value,
       amount: document.getElementById('transactionAmount').value,
       date: document.getElementById('transactionDate').value,
       notes: document.getElementById('transactionNotes').value.trim()
@@ -255,6 +265,14 @@ const Dashboard = {
 
     if (!data.accountId || data.accountId === 0) {
       errors.accountId = 'Please select an account';
+    }
+
+    if (!data.category) {
+      errors.category = 'Please select a category';
+    }
+
+    if (!data.paymentMethod) {
+      errors.paymentMethod = 'Please select a payment method';
     }
 
     if (!data.amount || isNaN(parseFloat(data.amount))) {
@@ -294,11 +312,18 @@ const Dashboard = {
             <div class="transaction-main">
               <span class="category-badge">${transaction.category}</span>
               <span class="account-name">${accountName}</span>
+              ${transaction.paymentMethod ? `<span class="payment-method">${transaction.paymentMethod}</span>` : ''}
             </div>
             <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
           </div>
-          <div class="transaction-amount ${transaction.type}">
-            ${transaction.type === 'credit' ? '+' : '-'}₹${transaction.amount.toFixed(2)}
+          <div class="transaction-amount-group">
+            <div class="transaction-amount ${transaction.type}">
+              ${transaction.type === 'credit' ? '+' : '-'}₹${transaction.amount.toFixed(2)}
+            </div>
+            <div class="transaction-actions">
+              <button type="button" class="btn-icon edit-btn" onclick="Dashboard.editTransaction(${transaction.id})" title="Edit">✎</button>
+              <button type="button" class="btn-icon delete-btn" onclick="Dashboard.deleteTransaction(${transaction.id})" title="Delete">✕</button>
+            </div>
           </div>
         </div>
       `;
@@ -419,6 +444,297 @@ const Dashboard = {
         errorDiv.className = 'error-message';
         errorDiv.textContent = message;
         input.after(errorDiv);
+      }
+    });
+  },
+
+  /**
+   * Populate payment method select
+   */
+  populatePaymentMethodSelect() {
+    const paymentSelects = document.querySelectorAll('#transactionPaymentMethod, #editPaymentMethod');
+    paymentSelects.forEach(select => {
+      select.innerHTML = this.paymentMethods.map(method => 
+        `<option value="${method}">${method}</option>`
+      ).join('');
+    });
+  },
+
+  /**
+   * Edit account - show modal
+   */
+  editAccount(accountId) {
+    const accounts = Storage.getAccounts();
+    const account = accounts.find(acc => acc.id === accountId);
+    
+    if (!account) {
+      alert('Account not found');
+      return;
+    }
+
+    const newBankName = prompt('Enter new bank name:', account.bankName);
+    if (newBankName === null) return;
+
+    const result = Storage.updateAccount(accountId, { bankName: newBankName });
+    if (result.success) {
+      alert('Account updated successfully!');
+      this.updateDashboard();
+      this.populateAccountSelects();
+    } else {
+      alert(result.message);
+    }
+  },
+
+  /**
+   * Delete account
+   */
+  deleteAccount(accountId) {
+    const accounts = Storage.getAccounts();
+    const account = accounts.find(acc => acc.id === accountId);
+    
+    if (!account) {
+      alert('Account not found');
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete the account "${account.bankName}"? This action cannot be undone.`)) {
+      const result = Storage.deleteAccount(accountId);
+      if (result.success) {
+        alert('Account deleted successfully!');
+        this.updateDashboard();
+        this.populateAccountSelects();
+      } else {
+        alert(result.message);
+      }
+    }
+  },
+
+  /**
+   * Edit transaction - show modal
+   */
+  editTransaction(transactionId) {
+    const transactions = Storage.getTransactions();
+    const transaction = transactions.find(t => t.id === transactionId);
+    
+    if (!transaction) {
+      alert('Transaction not found');
+      return;
+    }
+
+    const account = Storage.getAccounts().find(acc => acc.id === transaction.accountId);
+    if (!account) {
+      alert('Account not found');
+      return;
+    }
+
+    const newAmount = prompt('Enter new amount:', transaction.amount);
+    if (newAmount === null) return;
+
+    if (isNaN(parseFloat(newAmount)) || parseFloat(newAmount) <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    const result = Storage.updateTransaction(transactionId, {
+      amount: newAmount
+    });
+
+    if (result.success) {
+      alert('Transaction updated successfully!');
+      this.updateDashboard();
+    } else {
+      alert(result.message);
+    }
+  },
+
+  /**
+   * Delete transaction
+   */
+  deleteTransaction(transactionId) {
+    const transactions = Storage.getTransactions();
+    const transaction = transactions.find(t => t.id === transactionId);
+    
+    if (!transaction) {
+      alert('Transaction not found');
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete this transaction (${transaction.category} - ₹${transaction.amount})? This action cannot be undone.`)) {
+      const result = Storage.deleteTransaction(transactionId);
+      if (result.success) {
+        alert('Transaction deleted successfully!');
+        this.updateDashboard();
+      } else {
+        alert(result.message);
+      }
+    }
+  },
+
+  /**
+   * Display spending breakdown with category and payment method
+   */
+  displaySpendingBreakdown() {
+    const breakdown = Storage.getSpendingBreakdown();
+    const breakdownTable = document.getElementById('spendingBreakdownTable');
+
+    if (!breakdownTable) return;
+
+    if (!breakdown || breakdown.length === 0) {
+      breakdownTable.innerHTML = `
+        <tr>
+          <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-light);">
+            No data available. Add transactions to see breakdown.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    // Group and display breakdown data
+    const tableRows = breakdown.map(item => `
+      <tr style="border-bottom: 1px solid rgba(37, 99, 235, 0.1); transition: var(--transition);" onmouseover="this.style.backgroundColor='rgba(37, 99, 235, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+        <td style="padding: 0.75rem; color: var(--text-color);">${item.category}</td>
+        <td style="padding: 0.75rem; color: var(--text-color);">${item.method}</td>
+        <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--danger-color);">₹${parseFloat(item.amount).toFixed(2)}</td>
+        <td style="padding: 0.75rem; text-align: center; color: var(--text-light);">${item.count}</td>
+      </tr>
+    `).join('');
+
+    breakdownTable.innerHTML = tableRows;
+
+    // Create spending by category chart
+    this.createSpendingByCategoryChart(breakdown);
+
+    // Create spending by payment method chart
+    this.createSpendingByPaymentMethodChart(breakdown);
+  },
+
+  /**
+   * Create spending by category chart
+   */
+  createSpendingByCategoryChart(breakdown) {
+    const categoryData = {};
+    
+    breakdown.forEach(item => {
+      if (!categoryData[item.category]) {
+        categoryData[item.category] = 0;
+      }
+      categoryData[item.category] += parseFloat(item.amount);
+    });
+
+    const labels = Object.keys(categoryData);
+    const data = Object.values(categoryData);
+
+    const colors = [
+      '#2563eb', '#059669', '#dc2626', '#f59e0b', '#8b5cf6',
+      '#ec4899', '#14b8a6', '#3b82f6', '#a16207', '#1e40af'
+    ];
+
+    const canvas = document.getElementById('spendingByCategoryChart');
+    if (!canvas) return;
+
+    // Destroy previous chart if exists
+    const existingChart = this.categoryChart;
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    this.categoryChart = new Chart(canvas, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderColor: 'var(--light-bg)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: 'var(--text-color)',
+              padding: 15,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed || 0;
+                return `₹${value.toFixed(2)}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+   * Create spending by payment method chart
+   */
+  createSpendingByPaymentMethodChart(breakdown) {
+    const methodData = {};
+    
+    breakdown.forEach(item => {
+      if (!methodData[item.method]) {
+        methodData[item.method] = 0;
+      }
+      methodData[item.method] += parseFloat(item.amount);
+    });
+
+    const labels = Object.keys(methodData);
+    const data = Object.values(methodData);
+
+    const colors = [
+      '#059669', '#2563eb', '#dc2626', '#f59e0b', '#8b5cf6',
+      '#ec4899', '#14b8a6', '#3b82f6'
+    ];
+
+    const canvas = document.getElementById('spendingByMethodChart');
+    if (!canvas) return;
+
+    // Destroy previous chart if exists
+    const existingChart = this.methodChart;
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    this.methodChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderColor: 'var(--light-bg)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: 'var(--text-color)',
+              padding: 15,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed || 0;
+                return `₹${value.toFixed(2)}`;
+              }
+            }
+          }
+        }
       }
     });
   }
