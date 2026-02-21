@@ -169,6 +169,7 @@ const Storage = {
       accountId: transactionData.accountId,
       type: transactionData.type, // 'credit' or 'debit'
       category: transactionData.category,
+      paymentMethod: transactionData.paymentMethod,
       amount: parseFloat(transactionData.amount),
       date: transactionData.date,
       notes: transactionData.notes,
