@@ -19,27 +19,28 @@
 
       <nav class="sidebar-nav">
         <li class="sidebar-nav-item">
-          <a href="#dashboard" class="sidebar-nav-link">Dashboard</a>
+          <a href="#dashboard" class="sidebar-nav-link icon-dashboard" title="Dashboard">Dashboard</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#accounts" class="sidebar-nav-link">Accounts</a>
+          <a href="#accounts" class="sidebar-nav-link icon-accounts" title="Accounts">Accounts</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#transactions" class="sidebar-nav-link">Transactions</a>
+          <a href="#transactions" class="sidebar-nav-link icon-transactions" title="Transactions">Transactions</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#spending-breakdown" class="sidebar-nav-link">Spending Breakdown</a>
+          <a href="#spending-breakdown" class="sidebar-nav-link icon-breakdown" title="Spending">Spending</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#analytics" class="sidebar-nav-link">Analytics</a>
+          <a href="#analytics" class="sidebar-nav-link icon-analytics" title="Analytics">Analytics</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#insights" class="sidebar-nav-link">Insights</a>
+          <a href="#insights" class="sidebar-nav-link icon-insights" title="Insights">Insights</a>
         </li>
       </nav>
 
       <div class="sidebar-footer">
-        <button type="button" id="logoutBtn" class="btn btn-danger btn-block">Logout</button>
+        <button type="button" id="settingsBtn" class="btn btn-primary" title="Settings">⚙️</button>
+        <button type="button" id="logoutBtn" class="btn btn-danger" title="Logout">🚪</button>
       </div>
     </aside>
 
@@ -261,11 +262,75 @@
     </div>
   </div>
 
+  <!-- Account Settings Modal -->
+  <div id="accountSettingsModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAccountSettings()">&times;</button>
+      <div class="modal-header">
+        <h2>Account Settings</h2>
+      </div>
+      
+      <form class="settings-form" id="accountSettingsForm">
+        <!-- Profile Picture -->
+        <div class="profile-pic-input">
+          <div class="profile-pic-preview" id="profilePicPreview">👤</div>
+          <input type="file" id="profilePicFile" accept="image/*" style="display: none;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePicFile').click();">
+            Upload Photo
+          </button>
+        </div>
+
+        <!-- User Name -->
+        <div class="form-group">
+          <label for="settingsUserName">Full Name</label>
+          <input type="text" id="settingsUserName" placeholder="Enter your full name" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label for="settingsPhoneNumber">Phone Number</label>
+          <input type="tel" id="settingsPhoneNumber" placeholder="Enter your phone number">
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="settingsEmail">Email</label>
+          <input type="email" id="settingsEmail" placeholder="Enter your email" required>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="form-group">
+          <label for="settingsDarkMode">
+            <input type="checkbox" id="settingsDarkMode" style="margin-right: 0.5rem; width: auto;">
+            Dark Mode
+          </label>
+        </div>
+
+        <!-- PDF Export Section -->
+        <div class="pdf-export-section">
+          <h3>Download Reports</h3>
+          <div class="pdf-buttons">
+            <button type="button" class="btn btn-primary btn-pdf-day" onclick="exportPDF('day')">Daily</button>
+            <button type="button" class="btn btn-primary btn-pdf-week" onclick="exportPDF('week')">Weekly</button>
+            <button type="button" class="btn btn-primary btn-pdf-month" onclick="exportPDF('month')">Monthly</button>
+            <button type="button" class="btn btn-primary btn-pdf-year" onclick="exportPDF('year')">Yearly</button>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Save Settings
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
     // Set today's date as default in transaction form
@@ -275,6 +340,152 @@
       dateInput.value = today;
       dateInput.max = today;
     }
+
+    // Account Settings Functions
+    function openAccountSettings() {
+      const modal = document.getElementById('accountSettingsModal');
+      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      document.getElementById('settingsUserName').value = user.name || '';
+      document.getElementById('settingsEmail').value = user.email || '';
+      document.getElementById('settingsPhoneNumber').value = user.phone || '';
+      document.getElementById('settingsDarkMode').checked = localStorage.getItem('darkMode') === 'true';
+      modal.classList.add('active');
+    }
+
+    function closeAccountSettings() {
+      document.getElementById('accountSettingsModal').classList.remove('active');
+    }
+
+    // Save Settings
+    document.getElementById('accountSettingsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = {
+        name: document.getElementById('settingsUserName').value,
+        email: document.getElementById('settingsEmail').value,
+        phone: document.getElementById('settingsPhoneNumber').value
+      };
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      // Update dark mode
+      const darkModeEnabled = document.getElementById('settingsDarkMode').checked;
+      if (darkModeEnabled) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeIcon').textContent = '☀️';
+        localStorage.setItem('darkMode', 'true');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.getElementById('darkModeIcon').textContent = '🌙';
+        localStorage.setItem('darkMode', 'false');
+      }
+      
+      alert('Settings saved successfully!');
+      closeAccountSettings();
+    });
+
+    // Export to PDF
+    function exportPDF(period) {
+      const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+      const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+      const today = new Date();
+      let filteredTransactions = transactions;
+
+      // Filter transactions by period
+      if (period === 'day') {
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfDay);
+      } else if (period === 'week') {
+        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek);
+      } else if (period === 'month') {
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth);
+      } else if (period === 'year') {
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfYear);
+      }
+
+      // Calculate totals
+      let totalIncome = 0, totalExpense = 0;
+      filteredTransactions.forEach(t => {
+        if (t.type === 'credit') totalIncome += t.amount;
+        else totalExpense += t.amount;
+      });
+
+      // Create HTML content
+      const htmlContent = `
+        <html>
+          <head>
+            <title>Expense Report - ${period}</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, Arial; margin: 20px; }
+              h1 { color: #0066cc; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+              th { background-color: #0066cc; color: white; }
+              .summary { background-color: #f5f7fa; padding: 15px; border-radius: 8px; margin: 20px 0; }
+              .summary-item { display: inline-block; margin-right: 30px; }
+            </style>
+          </head>
+          <body>
+            <h1>Expense Report - ${period.charAt(0).toUpperCase() + period.slice(1)}</h1>
+            <p>Generated on: ${new Date().toLocaleDateString()}</p>
+            
+            <div class="summary">
+              <div class="summary-item"><strong>Total Income:</strong> ₹${totalIncome.toFixed(2)}</div>
+              <div class="summary-item"><strong>Total Expense:</strong> ₹${totalExpense.toFixed(2)}</div>
+              <div class="summary-item"><strong>Net:</strong> ₹${(totalIncome - totalExpense).toFixed(2)}</div>
+            </div>
+
+            <h2>Transactions</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Account</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredTransactions.map(t => {
+                  const account = accounts.find(a => a.id === t.accountId);
+                  return `<tr>
+                    <td>${new Date(t.date).toLocaleDateString()}</td>
+                    <td>${account ? account.bankName : 'Unknown'}</td>
+                    <td>${t.category}</td>
+                    <td>${t.type}</td>
+                    <td>₹${t.amount.toFixed(2)}</td>
+                    <td>${t.paymentMethod || 'N/A'}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+
+      // Generate PDF
+      const element = document.createElement('div');
+      element.innerHTML = htmlContent;
+      const opt = {
+        margin: 10,
+        filename: `expense-report-${period}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      html2pdf().set(opt).from(htmlContent).save();
+    }
+
+    // Settings button click
+    document.getElementById('settingsBtn').addEventListener('click', openAccountSettings);
+
+    // Close modal when clicking outside
+    document.getElementById('accountSettingsModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAccountSettings();
+    });
   </script>
 </body>
 </html>

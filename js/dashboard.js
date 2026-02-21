@@ -64,7 +64,21 @@ const Dashboard = {
     // Mobile menu toggle
     const menuToggle = document.getElementById('menuToggle');
     if (menuToggle) {
-      menuToggle.addEventListener('click', () => this.toggleMobileMenu());
+      menuToggle.addEventListener('click', () => this.toggleSidebar());
+    }
+
+    // Sidebar header toggle
+    const sidebarHeader = document.querySelector('.sidebar-header');
+    if (sidebarHeader) {
+      sidebarHeader.addEventListener('click', () => this.toggleSidebar());
+    }
+
+    // Settings button
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        window.openAccountSettings();
+      });
     }
 
     // Clear input errors on focus
@@ -107,10 +121,10 @@ const Dashboard = {
   /**
    * Toggle mobile menu
    */
-  toggleMobileMenu() {
+  toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
-      sidebar.classList.toggle('mobile-open');
+      sidebar.classList.toggle('expanded');
     }
   },
 
