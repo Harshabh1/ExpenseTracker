@@ -84,6 +84,10 @@ const Dashboard = {
    */
   toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    if (darkModeIcon) {
+      darkModeIcon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    }
     localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
   },
 
@@ -93,6 +97,10 @@ const Dashboard = {
   applyDarkModePreference() {
     if (localStorage.getItem('darkMode') === 'true') {
       document.body.classList.add('dark-mode');
+      const darkModeIcon = document.getElementById('darkModeIcon');
+      if (darkModeIcon) {
+        darkModeIcon.textContent = '☀️';
+      }
     }
   },
 
@@ -740,13 +748,46 @@ const Dashboard = {
   }
 };
 
+// ==================== SECTION MANAGEMENT ====================
+
+/**
+ * Setup smooth section navigation with smooth scroll
+ */
+function setupSectionNavigation() {
+  const navLinks = document.querySelectorAll('.sidebar-nav-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        navLinks.forEach(l => l.classList.remove('active'));
+        
+        // Add active class to clicked link
+        this.classList.add('active');
+        
+        // Smooth scroll to section
+        const sectionId = href.substring(1);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  });
+}
+
 // Initialize dashboard when page loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     Dashboard.init();
     Dashboard.applyDarkModePreference();
+    setupSectionNavigation();
   });
 } else {
   Dashboard.init();
   Dashboard.applyDarkModePreference();
+  setupSectionNavigation();
 }
