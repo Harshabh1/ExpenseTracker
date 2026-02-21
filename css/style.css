@@ -467,6 +467,18 @@ body.dark-mode .sidebar {
   position: relative;
 }
 
+.sidebar-logo {
+  width: 44px;
+  height: 44px;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.sidebar-title-wrap {
+  display: none;
+  text-align: left;
+}
+
 .sidebar-header h2 {
   font-size: 1.5rem;
   margin-bottom: 0;
@@ -495,16 +507,8 @@ body.dark-mode .sidebar {
   height: auto;
 }
 
-.sidebar-header::after {
-  content: '📊';
-  font-size: 2rem;
-  position: absolute;
-}
-
-.sidebar.expanded .sidebar-header::after {
-  position: static;
-  opacity: 0;
-  width: 0;
+.sidebar.expanded .sidebar-title-wrap {
+  display: block;
 }
 
 .sidebar-nav {
@@ -807,6 +811,72 @@ body.dark-mode .sidebar {
 
 .user-dropdown-menu .dropdown-item:hover {
   background-color: rgba(59,130,246,0.06);
+}
+
+/* Dropdown header inside profile menu */
+.dropdown-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  box-shadow: var(--shadow-md);
+}
+
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-name {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.dropdown-email {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.dropdown-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.5rem 0;
+  border-radius: 2px;
+}
+
+/* Animated appearance */
+.user-dropdown-menu {
+  transform-origin: top right;
+  transform: translateY(-6px) scale(0.98);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.user-dropdown-menu.active {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Sidebar header when collapsed center the logo */
+.sidebar-header {
+  justify-content: center;
+}
+
+.sidebar .sidebar-logo {
+  display: inline-block;
+}
+
+.sidebar.expanded .sidebar-logo {
+  margin-right: 0.75rem;
 }
 
 /* When sidebar collapsed keep icons centered */

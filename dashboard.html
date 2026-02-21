@@ -13,8 +13,11 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>Expense Tracker</h2>
-        <p>Track your finances</p>
+        <img src="assets/logo.svg" alt="ExpenseTracker" class="sidebar-logo" />
+        <div class="sidebar-title-wrap">
+          <h2>ExpenseTracker</h2>
+          <p>Track your finances</p>
+        </div>
       </div>
 
       <nav class="sidebar-nav">
@@ -55,20 +58,26 @@
         <div class="top-bar-controls">
           <!-- User Profile Dropdown -->
           <div class="user-profile-dropdown">
-            <button type="button" class="user-profile-btn" id="userProfileBtn">
+            <button type="button" class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false">
               <img id="userProfilePhoto" src="" alt="Profile" class="user-photo">
               <span id="userProfileName" class="user-name">User</span>
-              <span class="dropdown-arrow">▼</span>
+              <span class="dropdown-arrow">▾</span>
             </button>
-            <div class="user-dropdown-menu" id="userDropdownMenu">
-              <button type="button" class="dropdown-item" id="settingsBtn">
-                <span class="dropdown-icon">⚙️</span>
-                <span>Account Settings</span>
-              </button>
-              <button type="button" class="dropdown-item" id="logoutBtn">
-                <span class="dropdown-icon">🚪</span>
-                <span>Logout</span>
-              </button>
+            <div class="user-dropdown-menu" id="userDropdownMenu" role="menu" aria-hidden="true">
+              <div class="dropdown-header">
+                <img id="dropdownPhoto" src="" alt="Profile" class="dropdown-photo">
+                <div class="dropdown-user-info">
+                  <div id="dropdownName" class="dropdown-name">User</div>
+                  <div id="dropdownEmail" class="dropdown-email">you@example.com</div>
+                </div>
+              </div>
+              <div class="dropdown-actions">
+                <button type="button" class="dropdown-item" id="settingsBtn">⚙️ Account Settings</button>
+                <button type="button" class="dropdown-item" id="toggleDarkBtn">🌓 Toggle Theme</button>
+                <button type="button" class="dropdown-item" id="exportBtn">📥 Reports</button>
+                <div class="dropdown-separator"></div>
+                <button type="button" class="dropdown-item logout" id="logoutBtn">🚪 Logout</button>
+              </div>
             </div>
           </div>
         </div>
@@ -372,13 +381,30 @@
       if (userNameEl) {
         userNameEl.textContent = user.name || user.email || 'User';
       }
-      
+
+      // Populate dropdown header info
+      const dropdownName = document.getElementById('dropdownName');
+      const dropdownEmail = document.getElementById('dropdownEmail');
+      const dropdownPhoto = document.getElementById('dropdownPhoto');
+
+      if (dropdownName) dropdownName.textContent = user.name || user.email || 'User';
+      if (dropdownEmail) dropdownEmail.textContent = user.email || '';
+
       if (userPhotoEl) {
         if (userPhoto) {
           userPhotoEl.src = userPhoto;
           userPhotoEl.style.display = 'block';
         } else {
           userPhotoEl.style.display = 'none';
+        }
+      }
+
+      if (dropdownPhoto) {
+        if (userPhoto) {
+          dropdownPhoto.src = userPhoto;
+          dropdownPhoto.style.display = 'block';
+        } else {
+          dropdownPhoto.style.display = 'none';
         }
       }
     }
@@ -415,7 +441,10 @@
     function toggleUserDropdown() {
       const menu = document.getElementById('userDropdownMenu');
       if (menu) {
-        menu.classList.toggle('active');
+        const isActive = menu.classList.toggle('active');
+        // accessibility attributes
+        document.getElementById('userProfileBtn').setAttribute('aria-expanded', isActive);
+        menu.setAttribute('aria-hidden', !isActive);
       }
     }
 
@@ -571,13 +600,22 @@
       html2pdf().set(opt).from(htmlContent).save();
     }
 
-    // Settings button click
-    document.getElementById('settingsBtn').addEventListener('click', openAccountSettings);
+    // Settings button click (in dropdown)
+    document.getElementById('settingsBtn').addEventListener('click', function() { openAccountSettings(); document.getElementById('userDropdownMenu').classList.remove('active'); });
+
+    // Toggle theme from dropdown
+    document.getElementById('toggleDarkBtn').addEventListener('click', function() { Dashboard.toggleDarkMode(); document.getElementById('userDropdownMenu').classList.remove('active'); });
+
+    // Open settings/export when clicking reports (redirects to settings modal where PDF tools live)
+    document.getElementById('exportBtn').addEventListener('click', function() { openAccountSettings(); document.getElementById('userDropdownMenu').classList.remove('active'); });
 
     // User profile button toggle
     const userProfileBtn = document.getElementById('userProfileBtn');
     if (userProfileBtn) {
-      userProfileBtn.addEventListener('click', toggleUserDropdown);
+      userProfileBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleUserDropdown();
+      });
     }
 
     // Logout button click
