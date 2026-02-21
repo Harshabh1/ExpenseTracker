@@ -10,10 +10,25 @@ const Dashboard = {
    */
   init() {
     Auth.ensureLoggedIn();
+    this.displayUserGreeting();
     this.setupEventListeners();
     this.updateDashboard();
     this.populateAccountSelects();
     this.populateCategorySelect();
+  },
+
+  /**
+   * Display user greeting with first name
+   */
+  displayUserGreeting() {
+    const currentUser = Storage.getCurrentUser();
+    if (currentUser && currentUser.name) {
+      const firstName = currentUser.name.split(' ')[0];
+      const greetingElement = document.getElementById('userGreeting');
+      if (greetingElement) {
+        greetingElement.textContent = `Welcome back, ${firstName}!`;
+      }
+    }
   },
 
   /**

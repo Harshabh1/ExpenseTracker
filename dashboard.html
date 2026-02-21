@@ -13,25 +13,25 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>💰 Expense</h2>
+        <h2>Expense Tracker</h2>
         <p>Track your finances</p>
       </div>
 
       <nav class="sidebar-nav">
         <li class="sidebar-nav-item">
-          <a href="#dashboard" class="sidebar-nav-link">📊 Dashboard</a>
+          <a href="#dashboard" class="sidebar-nav-link">Dashboard</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#accounts" class="sidebar-nav-link">🏦 Accounts</a>
+          <a href="#accounts" class="sidebar-nav-link">Accounts</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#transactions" class="sidebar-nav-link">📝 Transactions</a>
+          <a href="#transactions" class="sidebar-nav-link">Transactions</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#analytics" class="sidebar-nav-link">📈 Analytics</a>
+          <a href="#analytics" class="sidebar-nav-link">Analytics</a>
         </li>
         <li class="sidebar-nav-item">
-          <a href="#insights" class="sidebar-nav-link">💡 Insights</a>
+          <a href="#insights" class="sidebar-nav-link">Insights</a>
         </li>
       </nav>
 
@@ -44,9 +44,14 @@
     <div class="main-content">
       <!-- Top Bar -->
       <div class="top-bar">
-        <h1>Dashboard</h1>
+        <div class="top-bar-left">
+          <h1>Dashboard</h1>
+          <p class="user-greeting" id="userGreeting">Welcome!</p>
+        </div>
         <div class="top-bar-controls">
-          <button type="button" id="darkModeToggle" class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+          <button type="button" id="darkModeToggle" class="dark-mode-toggle" title="Toggle Dark Mode">
+            <span class="toggle-text">Dark Mode</span>
+          </button>
           <button type="button" id="menuToggle" class="menu-toggle">☰</button>
         </div>
       </div>
@@ -63,15 +68,15 @@
               <div class="amount" id="totalBalanceAmount">₹0.00</div>
             </div>
             <div class="summary-card">
-              <h3>Total Income 💵</h3>
+              <h3>Total Income</h3>
               <div class="amount" id="totalCreditAmount">₹0.00</div>
             </div>
             <div class="summary-card">
-              <h3>Total Expenses 💸</h3>
+              <h3>Total Expenses</h3>
               <div class="amount" id="totalDebitAmount">₹0.00</div>
             </div>
             <div class="summary-card">
-              <h3>Net Savings 🎯</h3>
+              <h3>Net Savings</h3>
               <div class="amount" id="netSavingsAmount">₹0.00</div>
             </div>
           </div>
@@ -83,7 +88,7 @@
 
           <!-- Add Account Form -->
           <div style="margin-bottom: 2rem; background-color: var(--light-bg); padding: 1.5rem; border-radius: 0.5rem;">
-            <h3 style="margin-bottom: 1rem; color: var(--text-color);">➕ Add New Account</h3>
+            <h3 style="margin-bottom: 1rem; color: var(--text-color);">Add New Account</h3>
             <form id="addAccountForm">
               <div class="form-grid">
                 <div class="form-group">
@@ -121,7 +126,7 @@
 
           <!-- Add Transaction Form -->
           <div style="margin-bottom: 2rem; background-color: var(--light-bg); padding: 1.5rem; border-radius: 0.5rem;">
-            <h3 style="margin-bottom: 1rem; color: var(--text-color);">➕ Add New Transaction</h3>
+            <h3 style="margin-bottom: 1rem; color: var(--text-color);">Add New Transaction</h3>
             <form id="addTransactionForm">
               <div class="form-grid">
                 <div class="form-group">
