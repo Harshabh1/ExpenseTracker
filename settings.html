@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings - Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="settings-wrapper">
+    <!-- Back Button / Header -->
+    <div class="settings-header">
+      <button class="back-btn" onclick="window.history.back()">← Back</button>
+      <h1>Account Settings</h1>
+    </div>
+
+    <!-- Settings Container -->
+    <div class="settings-container">
+      <form id="settingsPageForm" class="settings-page-form">
+        <!-- Cover Photo Section -->
+        <div class="settings-section">
+          <h2>Profile Banner</h2>
+          <div class="cover-photo-area">
+            <img id="coverPhotoPreview" src="" alt="Cover" class="cover-photo-preview" />
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('coverPhotoInput').click();">
+              Upload Cover Photo
+            </button>
+            <input type="file" id="coverPhotoInput" accept="image/*" style="display:none;" />
+          </div>
+        </div>
+
+        <!-- Profile Photo Section -->
+        <div class="settings-section">
+          <h2>Profile Picture</h2>
+          <div class="profile-photo-area">
+            <img id="profilePhotoPreview" src="" alt="Profile" class="profile-photo-preview" />
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePhotoInput').click();">
+              Upload Photo
+            </button>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" />
+          </div>
+        </div>
+
+        <!-- Personal Info Section -->
+        <div class="settings-section">
+          <h2>Personal Information</h2>
+          
+          <div class="form-group">
+            <label for="settingsName">Full Name</label>
+            <input type="text" id="settingsName" placeholder="Enter your full name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsUsername">Username</label>
+            <input type="text" id="settingsUsername" placeholder="Enter your username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsEmail">Email Address</label>
+            <input type="email" id="settingsEmail" placeholder="Enter your email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsPhone">Phone Number</label>
+            <input type="tel" id="settingsPhone" placeholder="Enter your phone number">
+          </div>
+
+          <div class="form-group">
+            <label for="settingsDOB">Date of Birth</label>
+            <input type="date" id="settingsDOB">
+          </div>
+        </div>
+
+        <!-- Security Section -->
+        <div class="settings-section">
+          <h2>Security</h2>
+          
+          <div class="form-group">
+            <label for="settingsCurrentPassword">Current Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="settingsCurrentPassword" placeholder="Current password">
+              <button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsCurrentPassword')">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsNewPassword">New Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="settingsNewPassword" placeholder="New password">
+              <button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsNewPassword')">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsConfirmPassword">Confirm Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="settingsConfirmPassword" placeholder="Confirm password">
+              <button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsConfirmPassword')">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Section -->
+        <div class="settings-section">
+          <h2>Preferences</h2>
+          <div class="form-group checkbox-group">
+            <label for="settingsDarkMode" class="checkbox-label">
+              <input type="checkbox" id="settingsDarkMode">
+              <span>Enable Dark Mode</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="settings-actions">
+          <button type="submit" class="btn btn-primary btn-large">Save Changes</button>
+          <button type="button" class="btn btn-danger btn-large" id="deleteAccountBtn">Delete Account</button>
+          <button type="button" class="btn btn-secondary btn-large" onclick="window.history.back()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Load user data on page load
+    window.addEventListener('load', function() {
+      loadSettingsData();
+      applyDarkModePreference();
+    });
+
+    function loadSettingsData() {
+      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const profilePhoto = localStorage.getItem('userProfilePhoto') || '';
+      const coverPhoto = localStorage.getItem('userCoverPhoto') || '';
+
+      document.getElementById('settingsName').value = user.name || '';
+      document.getElementById('settingsUsername').value = user.username || user.email || '';
+      document.getElementById('settingsEmail').value = user.email || '';
+      document.getElementById('settingsPhone').value = user.phone || '';
+      document.getElementById('settingsDOB').value = user.dob || '';
+      document.getElementById('settingsDarkMode').checked = localStorage.getItem('darkMode') === 'true';
+
+      // Load photos
+      const profilePreview = document.getElementById('profilePhotoPreview');
+      const coverPreview = document.getElementById('coverPhotoPreview');
+
+      if (profilePhoto) {
+        profilePreview.src = profilePhoto;
+        profilePreview.style.display = 'block';
+      }
+
+      if (coverPhoto) {
+        coverPreview.src = coverPhoto;
+        coverPreview.style.display = 'block';
+      }
+    }
+
+    // Cover photo upload
+    document.getElementById('coverPhotoInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const data = ev.target.result;
+          localStorage.setItem('userCoverPhoto', data);
+          document.getElementById('coverPhotoPreview').src = data;
+          document.getElementById('coverPhotoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Profile photo upload
+    document.getElementById('profilePhotoInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const data = ev.target.result;
+          localStorage.setItem('userProfilePhoto', data);
+          document.getElementById('profilePhotoPreview').src = data;
+          document.getElementById('profilePhotoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Save settings form
+    document.getElementById('settingsPageForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const currentPass = document.getElementById('settingsCurrentPassword').value;
+      const newPass = document.getElementById('settingsNewPassword').value;
+      const confirmPass = document.getElementById('settingsConfirmPassword').value;
+
+      // Validate password change
+      if (newPass || confirmPass) {
+        if (!currentUser.password || currentUser.password !== currentPass) {
+          alert('Current password is incorrect.');
+          return;
+        }
+        if (newPass !== confirmPass) {
+          alert('New passwords do not match.');
+          return;
+        }
+        currentUser.password = newPass;
+      }
+
+      // Update user data
+      currentUser.name = document.getElementById('settingsName').value;
+      currentUser.username = document.getElementById('settingsUsername').value;
+      currentUser.email = document.getElementById('settingsEmail').value;
+      currentUser.phone = document.getElementById('settingsPhone').value;
+      currentUser.dob = document.getElementById('settingsDOB').value;
+
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+      // Handle dark mode
+      const darkModeEnabled = document.getElementById('settingsDarkMode').checked;
+      if (darkModeEnabled) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'false');
+      }
+
+      alert('Settings saved successfully!');
+      window.location.href = 'dashboard.html';
+    });
+
+    // Delete account
+    document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+      if (!confirm('Are you sure? This will delete your account and all data permanently.')) return;
+      if (!confirm('This action cannot be undone. Are you really sure?')) return;
+
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('accounts');
+      localStorage.removeItem('transactions');
+      localStorage.removeItem('userProfilePhoto');
+      localStorage.removeItem('userCoverPhoto');
+      localStorage.removeItem('darkMode');
+
+      alert('Account deleted. Redirecting to login...');
+      window.location.href = 'index.html';
+    });
+
+    // Toggle password visibility
+    function togglePasswordVisibility(fieldId) {
+      const field = document.getElementById(fieldId);
+      if (field.type === 'password') {
+        field.type = 'text';
+      } else {
+        field.type = 'password';
+      }
+    }
+
+    // Apply dark mode preference
+    function applyDarkModePreference() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+      }
+    }
+  </script>
+</body>
+</html>

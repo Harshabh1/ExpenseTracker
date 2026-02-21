@@ -29,6 +29,7 @@ body.dark-mode {
   --card-bg: #1f2937;
   --text-color: #f3f4f6;
   --text-light: #d1d5db;
+  --text-gray: #9ca3af;
   --border-color: #374151;
   --light-bg: #111827;
 }
@@ -153,6 +154,26 @@ label {
   letter-spacing: -0.3px;
 }
 
+/* Select dropdown styling for dark mode */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+body.dark-mode select {
+  color: var(--text-color);
+}
+
+/* Select option styling */
+select option {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -162,35 +183,23 @@ select,
 textarea {
   width: 100%;
   padding: 0.875rem 1.125rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border-color);
   border-radius: 0.75rem;
-  background-color: #ffffff;
-  color: #111827;
+  background-color: var(--card-bg);
+  color: var(--text-color);
   transition: var(--transition);
   font-size: 1rem;
   font-family: inherit;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-select,
-textarea {
-  background-color: #ffffff;
-}
-
-body.dark-mode input[type="text"],
-body.dark-mode input[type="email"],
-body.dark-mode input[type="password"],
-body.dark-mode input[type="number"],
-body.dark-mode input[type="date"],
-body.dark-mode select,
-body.dark-mode textarea {
-  background-color: #374151;
-  border-color: #4b5563;
-  color: #f3f4f6;
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="date"]::placeholder,
+select::placeholder,
+textarea::placeholder {
+  color: var(--text-gray);
 }
 
 input[type="text"]:focus,
@@ -201,9 +210,8 @@ input[type="date"]:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #0052cc;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15);
-  background-color: #ffffff;
   transform: translateY(-2px);
 }
 
@@ -214,7 +222,6 @@ body.dark-mode input[type="number"]:focus,
 body.dark-mode input[type="date"]:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
-  background-color: #1f2937;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
@@ -278,6 +285,58 @@ body.dark-mode select.error {
   margin-bottom: 1rem;
   border-radius: 0.75rem;
   animation: slideInDown 0.3s ease;
+}
+
+/* ==================== ADD ACCOUNT FORM ==================== */
+
+.add-account-form-wrapper {
+  margin-bottom: 2rem;
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.add-account-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-color);
+}
+
+.btn-add-account {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* ==================== ADD TRANSACTION FORM ==================== */
+
+.add-transaction-form-wrapper {
+  margin-bottom: 2rem;
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.add-transaction-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-color);
+}
+
+.btn-add-transaction {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -455,67 +514,66 @@ body.dark-mode .sidebar {
   background-color: #0f1419;
 }
 
+
 .sidebar-header {
-  padding: 0.75rem 0.75rem 1rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 0.75rem 0.6rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 1rem;
   animation: slideInDown 0.6s ease;
   text-align: left;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* keep logo at same left position */
+  min-height: 64px;
+  display: block;
   position: relative;
 }
 
+/* logo fixed position */
 .sidebar-logo {
   width: 44px;
   height: 44px;
-  display: inline-block;
-  margin-right: 0.5rem;
+  position: absolute;
+  left: 12px;
+  top: 12px;
 }
 
+/* title wrapper positioned absolutely so it doesn't affect layout */
 .sidebar-title-wrap {
-  display: none;
+  position: absolute;
+  left: 68px; /* align text start to icon area */
+  top: 12px; /* fixed top, above the divider */
+  transform: translateX(-6px);
+  opacity: 0;
   text-align: left;
-  margin-left: 0.5rem;
-}
-
-.sidebar-header h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  white-space: nowrap;
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  height: 0;
-}
-
-.sidebar-header p {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 400;
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-}
-
-.sidebar.expanded .sidebar-header h2,
-.sidebar.expanded .sidebar-header p {
-  opacity: 1;
-  height: auto;
+  margin: 0;
+  transition: opacity var(--motion-duration) cubic-bezier(.2,.8,.2,1), transform var(--motion-duration) cubic-bezier(.2,.8,.2,1);
+  pointer-events: none;
 }
 
 .sidebar.expanded .sidebar-title-wrap {
-  display: block;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  animation: slideInLeft var(--motion-duration) cubic-bezier(.2,.8,.2,1);
 }
 
-/* Prevent logo shifting by ensuring fixed spacing */
-.sidebar-logo {
-  flex: 0 0 44px;
+/* header text styles (always present but visually controlled by wrapper) */
+.sidebar-header h2 {
+  font-size: 1.4rem;
+  margin: 0 0 0.15rem 0;
+  padding: 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  color: inherit;
+  line-height: 1.2;
+}
+
+.sidebar-header p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .sidebar-nav {
@@ -544,35 +602,58 @@ body.dark-mode .sidebar {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.875rem;
+  position: relative;
+  padding: 0.875rem 0.75rem;
   color: #e5e7eb;
   border-left: 3px solid transparent;
   border-radius: 0.75rem;
   transition: var(--transition);
   font-weight: 500;
   font-size: 0.95rem;
-  position: relative;
   cursor: pointer;
   width: 100%;
   height: 50px;
-  margin: 0 0.5rem;
+  margin: 0;
   text-decoration: none;
+  line-height: 1; /* prevent line-height from affecting alignment */
 }
 
 .sidebar-nav-link::before {
-  font-size: 1.5rem;
-  margin-right: 0;
+  content: attr(data-icon);
+  position: absolute;
+  left: 16px; /* fixed x position for icons */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  line-height: 1;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar.expanded .sidebar-nav-link {
   justify-content: flex-start;
-  padding: 0.875rem 1.5rem;
-  margin: 0.25rem 0;
+  padding-left: 68px; /* leave space for icon + gap */
 }
 
-.sidebar.expanded .sidebar-nav-link::before {
-  margin-right: 1rem;
+.sidebar .nav-label {
+  position: absolute;
+  left: 64px; /* fixed position next to icon */
+  top: 48%; /* slightly higher to match icon baseline */
+  transform: translateY(-50%);
+  opacity: 0;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.3px;
+  transition: opacity 220ms cubic-bezier(.2,.8,.2,1), transform 220ms cubic-bezier(.2,.8,.2,1);
+}
+
+.sidebar.expanded .nav-label {
+  opacity: 1;
+  transform: translateY(-50%);
 }
 
 .sidebar-nav-link.icon-dashboard::before { content: '📊'; }
@@ -1833,6 +1914,17 @@ body.dark-mode .sidebar {
   }
 }
 
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .section, .summary-card, .account-card {
   animation: slideIn 0.3s ease;
 }
@@ -1855,4 +1947,311 @@ body.dark-mode .sidebar {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-color);
+}
+
+/* ===== Settings Page Styles ===== */
+.settings-wrapper {
+  min-height: 100vh;
+  background-color: var(--light-bg);
+  padding: 0;
+}
+
+.settings-header {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: var(--transition);
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background-color: var(--light-bg);
+}
+
+.settings-header h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.settings-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.settings-page-form {
+  background-color: var(--card-bg);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.settings-section {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+}
+
+.settings-section h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-color);
+}
+
+/* Cover Photo Section */
+.cover-photo-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cover-photo-preview {
+  width: 100%;
+  height: 200px;
+  background-color: var(--light-bg);
+  border-radius: 0.5rem;
+  object-fit: cover;
+  border: 2px dashed var(--border-color);
+  display: none;
+}
+
+.cover-photo-preview[src]:not([src=""]) {
+  display: block;
+}
+
+/* Profile Photo Section */
+.profile-photo-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-photo-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--light-bg);
+  border: 3px solid var(--primary-color);
+  display: none;
+}
+
+.profile-photo-preview[src]:not([src=""]) {
+  display: block;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-gray);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.password-input-wrapper input {
+  padding-right: 2.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  transition: var(--transition-fast);
+  padding: 0.5rem;
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+}
+
+/* Checkbox Group */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* Settings Actions */
+.settings-actions {
+  padding: 2rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-large {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0043a8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--light-bg);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--border-color);
+  border-color: var(--primary-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .settings-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-section {
+    padding: 1.5rem;
+  }
+
+  .settings-actions {
+    padding: 1.5rem;
+    flex-direction: column;
+  }
+
+  .btn-large {
+    width: 100%;
+  }
+
+  .cover-photo-preview {
+    height: 150px;
+  }
+
+  .profile-photo-preview {
+    width: 120px;
+    height: 120px;
+  }
 }

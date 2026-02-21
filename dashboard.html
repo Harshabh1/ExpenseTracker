@@ -58,7 +58,7 @@
         <div class="top-bar-controls">
           <!-- User Profile Dropdown -->
           <div class="user-profile-dropdown">
-            <button type="button" class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false">
+            <button type="button" class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false" onclick="toggleUserDropdown()">
               <img id="userProfilePhoto" src="" alt="Profile" class="user-photo" />
               <span class="user-initials" id="userInitials" aria-hidden="true">U</span>
               <span id="userProfileName" class="user-name">User</span>
@@ -72,17 +72,14 @@
                 </div>
               </div>
               <div class="dropdown-actions">
-                <button type="button" class="dropdown-item" id="settingsBtn">⚙️ Account Settings</button>
-                <button type="button" class="dropdown-item" id="toggleDarkBtn">🌓 Toggle Theme</button>
-                <button type="button" class="dropdown-item" id="reportsToggleBtn" aria-expanded="false">📥 Quick Reports</button>
+                <button type="button" class="dropdown-item" id="settingsBtn" onclick="window.location.href='settings.html'">⚙️ Account Settings</button>
+                <button type="button" class="dropdown-item" id="toggleDarkBtn" onclick="toggleDarkMode()">🌓 Toggle Theme</button>
+                <button type="button" class="dropdown-item" id="reportsToggleBtn" aria-expanded="false" onclick="toggleReportsMenu()">📥 Quick Reports</button>
                 <div class="reports-submenu" id="reportsSubmenu" aria-hidden="true">
-                  <button class="btn btn-small btn-icon" data-period="day">Daily (PDF)</button>
-                  <button class="btn btn-small btn-icon" data-period="week">Weekly (PDF)</button>
-                  <button class="btn btn-small btn-icon" data-period="month">Monthly (PDF)</button>
-                  <button class="btn btn-small btn-icon" id="quickPng">Export PNG</button>
+                  <button class="btn btn-small btn-icon" onclick="exportPNG()">Export PNG</button>
                 </div>
                 <div class="dropdown-separator"></div>
-                <button type="button" class="dropdown-item logout" id="logoutBtn">🚪 Logout</button>
+                <button type="button" class="dropdown-item logout" id="logoutBtn" onclick="logout()">🚪 Logout</button>
               </div>
             </div>
           </div>
@@ -120,8 +117,8 @@
           <h2 class="section-title">Bank Accounts</h2>
 
           <!-- Add Account Form -->
-          <div style="margin-bottom: 2rem; background-color: var(--light-bg); padding: 1.5rem; border-radius: 0.5rem;">
-            <h3 style="margin-bottom: 1rem; color: var(--text-color);">Add New Account</h3>
+          <div class="add-account-form-wrapper">
+            <h3 class="add-account-title">Add New Account</h3>
             <form id="addAccountForm">
               <div class="form-grid">
                 <div class="form-group">
@@ -140,10 +137,8 @@
                   <label for="initialBalance">Initial Balance</label>
                   <input type="number" id="initialBalance" step="0.01" placeholder="0.00" required>
                 </div>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary">Add Account</button>
-                </div>
               </div>
+              <button type="submit" class="btn btn-primary btn-add-account">Add Account</button>
             </form>
           </div>
 
@@ -158,8 +153,8 @@
           <h2 class="section-title">Transactions</h2>
 
           <!-- Add Transaction Form -->
-          <div style="margin-bottom: 2rem; background-color: var(--light-bg); padding: 1.5rem; border-radius: 0.5rem;">
-            <h3 style="margin-bottom: 1rem; color: var(--text-color);">Add New Transaction</h3>
+          <div class="add-transaction-form-wrapper">
+            <h3 class="add-transaction-title">Add New Transaction</h3>
             <form id="addTransactionForm">
               <div class="form-grid">
                 <div class="form-group">
@@ -199,10 +194,10 @@
                   <label for="transactionNotes">Notes (Optional)</label>
                   <textarea id="transactionNotes" placeholder="Add notes about this transaction" rows="3"></textarea>
                 </div>
-                <div class="form-group form-group-full">
-                  <button type="submit" class="btn btn-secondary">Add Transaction</button>
-                </div>
               </div>
+              <button type="submit" class="btn btn-secondary btn-add-transaction">Add Transaction</button>
+            </form>
+          </div>
             </form>
           </div>
 
@@ -290,95 +285,6 @@
     </div>
   </div>
 
-  <!-- Account Settings Modal -->
-  <div id="accountSettingsModal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeAccountSettings()">&times;</button>
-      <div class="modal-header">
-        <h2>Account Settings</h2>
-      </div>
-      
-      <form class="settings-form" id="accountSettingsForm">
-        <!-- Cover & Profile Photos -->
-        <div class="profile-pic-input">
-          <label>Cover Photo</label>
-          <div class="cover-pic-preview" id="coverPicPreview" style="height:80px; border-radius:8px; background-size:cover; background-position:center;"> </div>
-          <input type="file" id="coverPicFile" accept="image/*" style="display:none;" />
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('coverPicFile').click();">Upload Cover</button>
-
-          <label style="margin-top:0.75rem;">Profile Photo</label>
-          <div class="profile-pic-preview" id="profilePicPreview">👤</div>
-          <input type="file" id="profilePicFile" accept="image/*" style="display: none;">
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePicFile').click();">Upload Photo</button>
-        </div>
-
-        <!-- Full Name -->
-        <div class="form-group">
-          <label for="settingsUserName">Full Name</label>
-          <input type="text" id="settingsUserName" placeholder="Enter your full name" required>
-        </div>
-
-        <!-- Username -->
-        <div class="form-group">
-          <label for="settingsUsername">Username</label>
-          <input type="text" id="settingsUsername" placeholder="Enter your username" required>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label for="settingsEmail">Email Address</label>
-          <input type="email" id="settingsEmail" placeholder="Enter your email" required>
-        </div>
-
-        <!-- Phone Number -->
-        <div class="form-group">
-          <label for="settingsPhoneNumber">Phone Number</label>
-          <input type="tel" id="settingsPhoneNumber" placeholder="Enter your phone number">
-        </div>
-
-        <!-- Dark Mode Toggle -->
-        <div class="form-group checkbox-group">
-          <label for="settingsDarkMode" class="checkbox-label">
-            <input type="checkbox" id="settingsDarkMode">
-            <span>Enable Dark Mode</span>
-          </label>
-        </div>
-
-        <!-- Password Change -->
-        <div class="form-group">
-          <label for="settingsCurrentPassword">Current Password</label>
-          <div class="password-input-wrapper"><input type="password" id="settingsCurrentPassword" placeholder="Current password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsCurrentPassword')">👁️</button></div>
-        </div>
-        <div class="form-group">
-          <label for="settingsNewPassword">New Password</label>
-          <div class="password-input-wrapper"><input type="password" id="settingsNewPassword" placeholder="New password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsNewPassword')">👁️</button></div>
-        </div>
-        <div class="form-group">
-          <label for="settingsConfirmPassword">Confirm Password</label>
-          <div class="password-input-wrapper"><input type="password" id="settingsConfirmPassword" placeholder="Confirm password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsConfirmPassword')">👁️</button></div>
-        </div>
-
-        <!-- PDF Export Section -->
-        <div class="pdf-export-section">
-          <h3>Download Reports</h3>
-          <div class="pdf-buttons">
-            <button type="button" class="btn btn-primary btn-pdf-day" onclick="exportPDF('day')">Daily</button>
-            <button type="button" class="btn btn-primary btn-pdf-week" onclick="exportPDF('week')">Weekly</button>
-            <button type="button" class="btn btn-primary btn-pdf-month" onclick="exportPDF('month')">Monthly</button>
-            <button type="button" class="btn btn-primary btn-pdf-year" onclick="exportPDF('year')">Yearly</button>
-            <button type="button" class="btn btn-secondary" id="exportPNGBtn">Export PNG</button>
-          </div>
-        </div>
-
-        <!-- Danger actions + Save Button -->
-        <div style="display:flex; gap:0.75rem; align-items:center;">
-          <button type="button" class="btn btn-danger" id="deleteAccountBtn" style="flex:0 0 auto;">Delete Account</button>
-          <button type="submit" class="btn btn-primary" style="flex:1 1 auto;">Save Settings</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Scripts -->
   <script src="js/storage.js"></script>
   <script src="js/auth.js"></script>
@@ -401,12 +307,12 @@
       const user = JSON.parse(localStorage.getItem('currentUser')) || {};
       const userPhoto = localStorage.getItem('userProfilePhoto') || '';
       
-      // Update top-right user profile button
+      // Update top-right user profile button (show username or name)
       const userNameEl = document.getElementById('userProfileName');
       const userPhotoEl = document.getElementById('userProfilePhoto');
       
       if (userNameEl) {
-        userNameEl.textContent = user.name || user.email || 'User';
+        userNameEl.textContent = user.username || user.name || user.email || 'User';
       }
 
       // Populate dropdown header info
@@ -414,7 +320,7 @@
       const dropdownEmail = document.getElementById('dropdownEmail');
       const dropdownPhoto = document.getElementById('dropdownPhoto');
 
-      if (dropdownName) dropdownName.textContent = user.name || user.email || 'User';
+      if (dropdownName) dropdownName.textContent = user.name || user.username || user.email || 'User';
       if (dropdownEmail) dropdownEmail.textContent = user.email || '';
 
       if (userPhotoEl) {
@@ -449,35 +355,7 @@
       }
     }
 
-    function openAccountSettings() {
-      const modal = document.getElementById('accountSettingsModal');
-      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
-      const userPhoto = localStorage.getItem('userProfilePhoto') || '';
-      
-      document.getElementById('settingsUserName').value = user.name || '';
-      document.getElementById('settingsUsername').value = user.username || user.email || '';
-      document.getElementById('settingsEmail').value = user.email || '';
-      document.getElementById('settingsPhoneNumber').value = user.phone || '';
-      document.getElementById('settingsDarkMode').checked = localStorage.getItem('darkMode') === 'true';
-      
-      // Load profile photo preview
-      const preview = document.getElementById('profilePicPreview');
-      if (userPhoto) {
-        preview.style.backgroundImage = `url('${userPhoto}')`;
-        preview.textContent = '';
-      } else {
-        preview.style.backgroundImage = 'none';
-        preview.textContent = '👤';
-      }
-      
-      modal.classList.add('active');
-    }
-
-    function closeAccountSettings() {
-      document.getElementById('accountSettingsModal').classList.remove('active');
-    }
-
-    // Toggle User Dropdown Menu
+// Toggle User Dropdown Menu
     function toggleUserDropdown() {
       const menu = document.getElementById('userDropdownMenu');
       if (menu) {
@@ -485,6 +363,31 @@
         // accessibility attributes
         document.getElementById('userProfileBtn').setAttribute('aria-expanded', isActive);
         menu.setAttribute('aria-hidden', !isActive);
+      }
+    }
+
+    // Toggle Reports Menu
+    function toggleReportsMenu() {
+      const reportsSubmenu = document.getElementById('reportsSubmenu');
+      const reportsToggleBtn = document.getElementById('reportsToggleBtn');
+      if (reportsSubmenu) {
+        const isActive = reportsSubmenu.classList.toggle('active');
+        reportsToggleBtn.setAttribute('aria-expanded', isActive);
+        reportsSubmenu.setAttribute('aria-hidden', !isActive);
+      }
+    }
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
       }
     }
 
@@ -499,88 +402,6 @@
       }
     });
 
-    // Save Settings
-    document.getElementById('accountSettingsForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const user = {
-        name: document.getElementById('settingsUserName').value,
-        username: document.getElementById('settingsUsername').value,
-        email: document.getElementById('settingsEmail').value,
-        phone: document.getElementById('settingsPhoneNumber').value
-      };
-      // Handle password change if provided
-      const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
-      const currentPass = document.getElementById('settingsCurrentPassword').value;
-      const newPass = document.getElementById('settingsNewPassword').value;
-      const confirmPass = document.getElementById('settingsConfirmPassword').value;
-
-      if (newPass || confirmPass) {
-        if (!currentUser.password || currentUser.password !== currentPass) {
-          alert('Current password is incorrect.');
-          return;
-        }
-        if (newPass !== confirmPass) {
-          alert('New passwords do not match.');
-          return;
-        }
-        currentUser.password = newPass;
-      }
-
-      // Merge saved values with existing user object
-      const merged = Object.assign({}, currentUser, user);
-      localStorage.setItem('currentUser', JSON.stringify(merged));
-      
-      // Update dark mode
-      const darkModeEnabled = document.getElementById('settingsDarkMode').checked;
-      if (darkModeEnabled) {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('darkMode', 'true');
-      } else {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('darkMode', 'false');
-      }
-      
-      // Reload user profile
-      loadUserProfile();
-      
-      alert('Settings saved successfully!');
-      closeAccountSettings();
-    });
-
-    // Handle profile photo upload
-    document.getElementById('profilePicFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const photoData = event.target.result;
-          localStorage.setItem('userProfilePhoto', photoData);
-          const preview = document.getElementById('profilePicPreview');
-          preview.style.backgroundImage = `url('${photoData}')`;
-          preview.textContent = '';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Handle cover photo upload
-    const coverFile = document.getElementById('coverPicFile');
-    if (coverFile) {
-      coverFile.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            const data = ev.target.result;
-            localStorage.setItem('userCoverPhoto', data);
-            const preview = document.getElementById('coverPicPreview');
-            if (preview) preview.style.backgroundImage = `url('${data}')`;
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
     // Export PNG of dashboard content
     function exportPNG() {
       const el = document.querySelector('.dashboard-content');
@@ -593,186 +414,8 @@
       }).catch(err => alert('Export failed'));
     }
 
-    document.getElementById('exportPNGBtn').addEventListener('click', function(){ exportPNG(); });
-
-    // Delete account
-    document.getElementById('deleteAccountBtn').addEventListener('click', function(){
-      if (!confirm('Delete your account and all local data? This cannot be undone.')) return;
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('accounts');
-      localStorage.removeItem('transactions');
-      localStorage.removeItem('userProfilePhoto');
-      localStorage.removeItem('userCoverPhoto');
-      alert('Account deleted. Redirecting to login.');
-      window.location.href = 'index.html';
-    });
-
     // Export to PDF
-    function exportPDF(period) {
-      const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-      const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-      const today = new Date();
-      let filteredTransactions = transactions;
-
-      // Filter transactions by period
-      if (period === 'day') {
-        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfDay);
-      } else if (period === 'week') {
-        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek);
-      } else if (period === 'month') {
-        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth);
-      } else if (period === 'year') {
-        const startOfYear = new Date(today.getFullYear(), 0, 1);
-        filteredTransactions = transactions.filter(t => new Date(t.date) >= startOfYear);
-      }
-
-      // Calculate totals
-      let totalIncome = 0, totalExpense = 0;
-      filteredTransactions.forEach(t => {
-        if (t.type === 'credit') totalIncome += t.amount;
-        else totalExpense += t.amount;
-      });
-
-      // Create HTML content
-      const htmlContent = `
-        <html>
-          <head>
-            <title>Expense Report - ${period}</title>
-            <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, Arial; margin: 20px; }
-              h1 { color: #0066cc; }
-              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-              th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-              th { background-color: #0066cc; color: white; }
-              .summary { background-color: #f5f7fa; padding: 15px; border-radius: 8px; margin: 20px 0; }
-              .summary-item { display: inline-block; margin-right: 30px; }
-            </style>
-          </head>
-          <body>
-            <h1>Expense Report - ${period.charAt(0).toUpperCase() + period.slice(1)}</h1>
-            <p>Generated on: ${new Date().toLocaleDateString()}</p>
-            
-            <div class="summary">
-              <div class="summary-item"><strong>Total Income:</strong> ₹${totalIncome.toFixed(2)}</div>
-              <div class="summary-item"><strong>Total Expense:</strong> ₹${totalExpense.toFixed(2)}</div>
-              <div class="summary-item"><strong>Net:</strong> ₹${(totalIncome - totalExpense).toFixed(2)}</div>
-            </div>
-
-            <h2>Transactions</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Account</th>
-                  <th>Category</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filteredTransactions.map(t => {
-                  const account = accounts.find(a => a.id === t.accountId);
-                  return `<tr>
-                    <td>${new Date(t.date).toLocaleDateString()}</td>
-                    <td>${account ? account.bankName : 'Unknown'}</td>
-                    <td>${t.category}</td>
-                    <td>${t.type}</td>
-                    <td>₹${t.amount.toFixed(2)}</td>
-                    <td>${t.paymentMethod || 'N/A'}</td>
-                  </tr>`;
-                }).join('')}
-              </tbody>
-            </table>
-          </body>
-        </html>
-      `;
-
-      // Generate PDF
-      const element = document.createElement('div');
-      element.innerHTML = htmlContent;
-      const opt = {
-        margin: 10,
-        filename: `expense-report-${period}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-      };
-      html2pdf().set(opt).from(htmlContent).save();
-    }
-
-    // Settings button click (in dropdown)
-    document.getElementById('settingsBtn').addEventListener('click', function() { openAccountSettings(); document.getElementById('userDropdownMenu').classList.remove('active'); });
-
-    // Toggle theme from dropdown
-    document.getElementById('toggleDarkBtn').addEventListener('click', function() { Dashboard.toggleDarkMode(); document.getElementById('userDropdownMenu').classList.remove('active'); });
-
-    // Open settings/export when clicking reports (redirects to settings modal where PDF tools live)
-    document.getElementById('exportBtn').addEventListener('click', function() { openAccountSettings(); document.getElementById('userDropdownMenu').classList.remove('active'); });
-
-    // User profile button toggle
-    const userProfileBtn = document.getElementById('userProfileBtn');
-    if (userProfileBtn) {
-      userProfileBtn.addEventListener('click', function(e){
-        e.stopPropagation();
-        toggleUserDropdown();
-      });
-    }
-
-    // Logout button click
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('userProfilePhoto');
-        window.location.href = 'index.html';
-      }
-    });
-
-    // Reports submenu toggle
-    const reportsToggle = document.getElementById('reportsToggleBtn');
-    const reportsSubmenu = document.getElementById('reportsSubmenu');
-    if (reportsToggle && reportsSubmenu) {
-      reportsToggle.addEventListener('click', function(e){
-        e.stopPropagation();
-        const expanded = reportsSubmenu.classList.toggle('open');
-        reportsToggle.setAttribute('aria-expanded', expanded);
-        reportsSubmenu.setAttribute('aria-hidden', !expanded);
-      });
-
-      // quick PDF buttons inside submenu
-      reportsSubmenu.querySelectorAll('button[data-period]').forEach(btn => {
-        btn.addEventListener('click', function(e){
-          const period = this.getAttribute('data-period');
-          exportPDF(period);
-          // close menus
-          reportsSubmenu.classList.remove('open');
-          document.getElementById('userDropdownMenu').classList.remove('active');
-        });
-      });
-
-      // quick PNG button
-      const quickPng = document.getElementById('quickPng');
-      if (quickPng) {
-        quickPng.addEventListener('click', function(){ exportPNG(); document.getElementById('userDropdownMenu').classList.remove('active'); });
-      }
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('accountSettingsModal').addEventListener('click', function(e) {
-      if (e.target === this) closeAccountSettings();
-    });
-
-    // Initialize user profile on page load
-    window.addEventListener('load', function() {
-      loadUserProfile();
-      // Load dark mode preference
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-      }
-    });
+    // PDF export removed
   </script>
 </body>
 </html>
