@@ -60,6 +60,7 @@
           <div class="user-profile-dropdown">
             <button type="button" class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false">
               <img id="userProfilePhoto" src="" alt="Profile" class="user-photo">
+              <span class="user-initials" id="userInitials" aria-hidden="true">U</span>
               <span id="userProfileName" class="user-name">User</span>
               <span class="dropdown-arrow">▾</span>
             </button>
@@ -396,6 +397,19 @@
           userPhotoEl.style.display = 'block';
         } else {
           userPhotoEl.style.display = 'none';
+        }
+      }
+
+      // Initials fallback
+      const userInitialsEl = document.getElementById('userInitials');
+      const nameForInitials = user.name || user.username || user.email || 'U';
+      const initials = nameForInitials.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+      if (userInitialsEl) {
+        userInitialsEl.textContent = initials;
+        if (userPhoto) {
+          userInitialsEl.style.display = 'none';
+        } else {
+          userInitialsEl.style.display = 'inline-flex';
         }
       }
 

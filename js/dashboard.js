@@ -124,7 +124,14 @@ const Dashboard = {
   toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
-      sidebar.classList.toggle('expanded');
+      const expanded = sidebar.classList.toggle('expanded');
+      // sync menu toggle button state
+      const menuBtn = document.getElementById('menuToggle');
+      if (menuBtn) {
+        if (expanded) menuBtn.classList.add('active');
+        else menuBtn.classList.remove('active');
+        menuBtn.setAttribute('aria-expanded', expanded);
+      }
     }
   },
 

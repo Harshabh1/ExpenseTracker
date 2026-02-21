@@ -680,8 +680,9 @@ body.dark-mode .sidebar {
 
 .top-bar-left {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-direction: row;
+  gap: 0.75rem;
+  align-items: center;
   animation: slideInUp 0.5s ease;
 }
 
@@ -710,17 +711,38 @@ body.dark-mode .sidebar {
 .dark-mode-toggle, .menu-toggle {
   background: var(--light-bg);
   border: 1px solid var(--border-color);
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: var(--transition);
   color: var(--text-color);
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.75rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.6rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   box-shadow: var(--shadow);
+  margin-right: 0.5rem;
+}
+
+/* Hamburger active state animation */
+.menu-toggle {
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.menu-toggle.active {
+  transform: rotate(90deg) scale(1.02);
+  background-color: var(--primary-light);
+  color: white;
+}
+
+/* reveal nav labels on hover when collapsed */
+.sidebar:not(.expanded) .sidebar-nav-link:hover .nav-label {
+  display: inline-block;
+  opacity: 1;
+  transform: translateX(8px);
+  position: relative;
+  left: 8px;
 }
 
 .dark-mode-toggle:hover, .menu-toggle:hover {
@@ -776,6 +798,19 @@ body.dark-mode .sidebar {
   border-radius: 50%;
   object-fit: cover;
   display: inline-block;
+}
+
+.user-initials {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .user-dropdown-menu {
