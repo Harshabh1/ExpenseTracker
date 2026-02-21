@@ -201,3 +201,18 @@ const Auth = {
     window.location.href = 'index.html';
   }
 };
+
+/**
+ * Toggle password visibility
+ */
+function togglePasswordVisibility(fieldId) {
+  const field = document.getElementById(fieldId);
+  const isPassword = field.type === 'password';
+  field.type = isPassword ? 'text' : 'password';
+  
+  // Update button text/emoji
+  const button = field.parentElement.querySelector('.password-toggle');
+  if (button) {
+    button.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+  }
+}
