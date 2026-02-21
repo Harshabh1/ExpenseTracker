@@ -59,10 +59,9 @@
           <!-- User Profile Dropdown -->
           <div class="user-profile-dropdown">
             <button type="button" class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false">
-              <img id="userProfilePhoto" src="" alt="Profile" class="user-photo">
+              <img id="userProfilePhoto" src="" alt="Profile" class="user-photo" />
               <span class="user-initials" id="userInitials" aria-hidden="true">U</span>
               <span id="userProfileName" class="user-name">User</span>
-              <span class="dropdown-arrow">▾</span>
             </button>
             <div class="user-dropdown-menu" id="userDropdownMenu" role="menu" aria-hidden="true">
               <div class="dropdown-header">
@@ -75,7 +74,13 @@
               <div class="dropdown-actions">
                 <button type="button" class="dropdown-item" id="settingsBtn">⚙️ Account Settings</button>
                 <button type="button" class="dropdown-item" id="toggleDarkBtn">🌓 Toggle Theme</button>
-                <button type="button" class="dropdown-item" id="exportBtn">📥 Reports</button>
+                <button type="button" class="dropdown-item" id="reportsToggleBtn" aria-expanded="false">📥 Quick Reports</button>
+                <div class="reports-submenu" id="reportsSubmenu" aria-hidden="true">
+                  <button class="btn btn-small btn-icon" data-period="day">Daily (PDF)</button>
+                  <button class="btn btn-small btn-icon" data-period="week">Weekly (PDF)</button>
+                  <button class="btn btn-small btn-icon" data-period="month">Monthly (PDF)</button>
+                  <button class="btn btn-small btn-icon" id="quickPng">Export PNG</button>
+                </div>
                 <div class="dropdown-separator"></div>
                 <button type="button" class="dropdown-item logout" id="logoutBtn">🚪 Logout</button>
               </div>
@@ -294,13 +299,17 @@
       </div>
       
       <form class="settings-form" id="accountSettingsForm">
-        <!-- Profile Picture -->
+        <!-- Cover & Profile Photos -->
         <div class="profile-pic-input">
+          <label>Cover Photo</label>
+          <div class="cover-pic-preview" id="coverPicPreview" style="height:80px; border-radius:8px; background-size:cover; background-position:center;"> </div>
+          <input type="file" id="coverPicFile" accept="image/*" style="display:none;" />
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('coverPicFile').click();">Upload Cover</button>
+
+          <label style="margin-top:0.75rem;">Profile Photo</label>
           <div class="profile-pic-preview" id="profilePicPreview">👤</div>
           <input type="file" id="profilePicFile" accept="image/*" style="display: none;">
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePicFile').click();">
-            Upload Photo
-          </button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('profilePicFile').click();">Upload Photo</button>
         </div>
 
         <!-- Full Name -->
@@ -335,6 +344,20 @@
           </label>
         </div>
 
+        <!-- Password Change -->
+        <div class="form-group">
+          <label for="settingsCurrentPassword">Current Password</label>
+          <div class="password-input-wrapper"><input type="password" id="settingsCurrentPassword" placeholder="Current password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsCurrentPassword')">👁️</button></div>
+        </div>
+        <div class="form-group">
+          <label for="settingsNewPassword">New Password</label>
+          <div class="password-input-wrapper"><input type="password" id="settingsNewPassword" placeholder="New password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsNewPassword')">👁️</button></div>
+        </div>
+        <div class="form-group">
+          <label for="settingsConfirmPassword">Confirm Password</label>
+          <div class="password-input-wrapper"><input type="password" id="settingsConfirmPassword" placeholder="Confirm password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('settingsConfirmPassword')">👁️</button></div>
+        </div>
+
         <!-- PDF Export Section -->
         <div class="pdf-export-section">
           <h3>Download Reports</h3>
@@ -343,13 +366,15 @@
             <button type="button" class="btn btn-primary btn-pdf-week" onclick="exportPDF('week')">Weekly</button>
             <button type="button" class="btn btn-primary btn-pdf-month" onclick="exportPDF('month')">Monthly</button>
             <button type="button" class="btn btn-primary btn-pdf-year" onclick="exportPDF('year')">Yearly</button>
+            <button type="button" class="btn btn-secondary" id="exportPNGBtn">Export PNG</button>
           </div>
         </div>
 
-        <!-- Save Button -->
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-          Save Settings
-        </button>
+        <!-- Danger actions + Save Button -->
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+          <button type="button" class="btn btn-danger" id="deleteAccountBtn" style="flex:0 0 auto;">Delete Account</button>
+          <button type="submit" class="btn btn-primary" style="flex:1 1 auto;">Save Settings</button>
+        </div>
       </form>
     </div>
   </div>
@@ -359,6 +384,7 @@
   <script src="js/auth.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
@@ -482,7 +508,27 @@
         email: document.getElementById('settingsEmail').value,
         phone: document.getElementById('settingsPhoneNumber').value
       };
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      // Handle password change if provided
+      const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const currentPass = document.getElementById('settingsCurrentPassword').value;
+      const newPass = document.getElementById('settingsNewPassword').value;
+      const confirmPass = document.getElementById('settingsConfirmPassword').value;
+
+      if (newPass || confirmPass) {
+        if (!currentUser.password || currentUser.password !== currentPass) {
+          alert('Current password is incorrect.');
+          return;
+        }
+        if (newPass !== confirmPass) {
+          alert('New passwords do not match.');
+          return;
+        }
+        currentUser.password = newPass;
+      }
+
+      // Merge saved values with existing user object
+      const merged = Object.assign({}, currentUser, user);
+      localStorage.setItem('currentUser', JSON.stringify(merged));
       
       // Update dark mode
       const darkModeEnabled = document.getElementById('settingsDarkMode').checked;
@@ -515,6 +561,50 @@
         };
         reader.readAsDataURL(file);
       }
+    });
+
+    // Handle cover photo upload
+    const coverFile = document.getElementById('coverPicFile');
+    if (coverFile) {
+      coverFile.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const data = ev.target.result;
+            localStorage.setItem('userCoverPhoto', data);
+            const preview = document.getElementById('coverPicPreview');
+            if (preview) preview.style.backgroundImage = `url('${data}')`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Export PNG of dashboard content
+    function exportPNG() {
+      const el = document.querySelector('.dashboard-content');
+      if (!el) return alert('Nothing to export');
+      html2canvas(el, {scale:2}).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = `expense-report-${new Date().toISOString().slice(0,10)}.png`;
+        link.click();
+      }).catch(err => alert('Export failed'));
+    }
+
+    document.getElementById('exportPNGBtn').addEventListener('click', function(){ exportPNG(); });
+
+    // Delete account
+    document.getElementById('deleteAccountBtn').addEventListener('click', function(){
+      if (!confirm('Delete your account and all local data? This cannot be undone.')) return;
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('accounts');
+      localStorage.removeItem('transactions');
+      localStorage.removeItem('userProfilePhoto');
+      localStorage.removeItem('userCoverPhoto');
+      alert('Account deleted. Redirecting to login.');
+      window.location.href = 'index.html';
     });
 
     // Export to PDF
@@ -640,6 +730,35 @@
         window.location.href = 'index.html';
       }
     });
+
+    // Reports submenu toggle
+    const reportsToggle = document.getElementById('reportsToggleBtn');
+    const reportsSubmenu = document.getElementById('reportsSubmenu');
+    if (reportsToggle && reportsSubmenu) {
+      reportsToggle.addEventListener('click', function(e){
+        e.stopPropagation();
+        const expanded = reportsSubmenu.classList.toggle('open');
+        reportsToggle.setAttribute('aria-expanded', expanded);
+        reportsSubmenu.setAttribute('aria-hidden', !expanded);
+      });
+
+      // quick PDF buttons inside submenu
+      reportsSubmenu.querySelectorAll('button[data-period]').forEach(btn => {
+        btn.addEventListener('click', function(e){
+          const period = this.getAttribute('data-period');
+          exportPDF(period);
+          // close menus
+          reportsSubmenu.classList.remove('open');
+          document.getElementById('userDropdownMenu').classList.remove('active');
+        });
+      });
+
+      // quick PNG button
+      const quickPng = document.getElementById('quickPng');
+      if (quickPng) {
+        quickPng.addEventListener('click', function(){ exportPNG(); document.getElementById('userDropdownMenu').classList.remove('active'); });
+      }
+    }
 
     // Close modal when clicking outside
     document.getElementById('accountSettingsModal').addEventListener('click', function(e) {

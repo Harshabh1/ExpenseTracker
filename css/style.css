@@ -20,8 +20,9 @@
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.15);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-duration: 260ms;
+  --transition: all var(--motion-duration) cubic-bezier(.2,.8,.2,1);
+  --transition-fast: all 140ms cubic-bezier(.2,.8,.2,1);
 }
 
 body.dark-mode {
@@ -455,15 +456,15 @@ body.dark-mode .sidebar {
 }
 
 .sidebar-header {
-  padding: 0 0.75rem 1rem;
+  padding: 0.75rem 0.75rem 1rem 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 1rem;
   animation: slideInDown 0.6s ease;
-  text-align: center;
+  text-align: left;
   min-height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* keep logo at same left position */
   position: relative;
 }
 
@@ -477,6 +478,7 @@ body.dark-mode .sidebar {
 .sidebar-title-wrap {
   display: none;
   text-align: left;
+  margin-left: 0.5rem;
 }
 
 .sidebar-header h2 {
@@ -509,6 +511,11 @@ body.dark-mode .sidebar {
 
 .sidebar.expanded .sidebar-title-wrap {
   display: block;
+}
+
+/* Prevent logo shifting by ensuring fixed spacing */
+.sidebar-logo {
+  flex: 0 0 44px;
 }
 
 .sidebar-nav {
@@ -727,7 +734,7 @@ body.dark-mode .sidebar {
 
 /* Hamburger active state animation */
 .menu-toggle {
-  transition: transform 180ms ease, background-color 180ms ease;
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1), background-color 260ms cubic-bezier(.2,.8,.2,1);
 }
 
 .menu-toggle.active {
@@ -797,7 +804,7 @@ body.dark-mode .sidebar {
   height: 34px;
   border-radius: 50%;
   object-fit: cover;
-  display: inline-block;
+  display: none; /* hidden by default until JS shows it */
 }
 
 .user-initials {
@@ -817,7 +824,7 @@ body.dark-mode .sidebar {
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  min-width: 200px;
+  min-width: 240px;
   background-color: var(--card-bg);
   border-radius: 0.75rem;
   box-shadow: var(--shadow-lg);
@@ -825,11 +832,17 @@ body.dark-mode .sidebar {
   display: none;
   flex-direction: column;
   padding: 0.5rem;
-  z-index: 1300;
+  z-index: 1400;
+  transform-origin: top right;
+  transform: translateY(-8px) scale(0.98);
+  opacity: 0;
+  transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease;
 }
 
 .user-dropdown-menu.active {
   display: flex;
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }
 
 .user-dropdown-menu .dropdown-item {
@@ -864,6 +877,7 @@ body.dark-mode .sidebar {
   object-fit: cover;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   box-shadow: var(--shadow-md);
+  display: none; /* hidden until JS sets photo */
 }
 
 .dropdown-user-info {
@@ -886,6 +900,40 @@ body.dark-mode .sidebar {
   background: var(--border-color);
   margin: 0.5rem 0;
   border-radius: 2px;
+}
+
+/* Reports submenu inside dropdown */
+.reports-submenu {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin: 0.5rem 0 0 0;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+  transform-origin: top right;
+  transform: translateY(-6px) scale(0.98);
+  opacity: 0;
+  transition: transform var(--motion-duration) cubic-bezier(.2,.8,.2,1), opacity calc(var(--motion-duration) - 60ms) ease;
+}
+
+.reports-submenu.open {
+  display: flex;
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.btn-small {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border-color);
+  background: var(--light-bg);
+}
+
+.btn-small.btn-icon {
+  display: inline-block;
+  text-align: center;
 }
 
 /* Animated appearance */
